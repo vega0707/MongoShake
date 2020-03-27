@@ -29,6 +29,8 @@ var (
 type Batcher struct {
 	// related oplog syncer. not owned
 	syncer *OplogSyncer
+	// 有数自定义拦截器
+	udataFilter     filter.MySqlFilter
 
 	// filter functionality by gid
 	filterList filter.OplogFilterChain
@@ -53,12 +55,14 @@ type Batcher struct {
 
 func NewBatcher(syncer *OplogSyncer, filterList filter.OplogFilterChain,
 	handler OplogHandler, workerGroup []*Worker) *Batcher {
+	udataFilter := filter.NewMySqlFilter()
 	return &Batcher{
 		syncer:           syncer,
 		filterList:       filterList,
 		handler:          handler,
 		workerGroup:      workerGroup,
 		lastResponseTime: time.Now(),
+		udataFilter: udataFilter,
 	}
 }
 
@@ -174,6 +178,9 @@ func (batcher *Batcher) filterAndBlockMoveChunk(nextBatch []*oplog.GenericOplog,
 			}
 		}
 		if noopFilter.Filter(genericLog.Parsed) || moveChunkFilter.Filter(genericLog.Parsed) {
+			continue
+		}
+		if batcher.udataFilter.Filter(genericLog.Parsed) {
 			continue
 		}
 		// current is ddl and barrier == false

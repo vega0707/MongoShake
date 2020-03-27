@@ -371,6 +371,25 @@ func (sync *OplogSyncer) next() bool {
 		sync.replMetric.SetOplogMax(payload)
 		sync.replMetric.SetOplogAvg(payload)
 		sync.replMetric.ReplStatus.Clear(utils.FetchBad)
+		//test := bson.M{}
+		//if err1 := bson.UnmarshalJSON(log.Data, test); err1 != nil {
+		//	fmt.Printf("Unmarshal fail: %v", err1)
+		//}
+
+		//if errin := log.Unmarshal(test); errin != nil {
+		//	fmt.Printf("Unmarshal fail: %v", errin)
+		//}
+		// map[h:0 ns:youshu.test o:map[$set:map[name:testttt] $v:1] o2:map[_id:4] op:u t:1
+		// ts:6805825681415471105 ui:{4 [173 96 220 206 71 236 67 31 162 111 233 122 124 218 28 148]}
+		// v:2 wall:2020-03-19 07:59:34.074 +0000 UTC]
+		//if namespace := test["ns"]; strings.HasPrefix(namespace.(string), "youshu") {
+		//	fmt.Println(test)
+		//fmt.Println(log.Data)
+		//	fmt.Println(test["ns"])
+		//	fmt.Println(reflect.TypeOf(test["o2"]))
+		//	fmt.Println(test["o2"])
+		//}
+		//return false
 	} else if err != nil && err != TimeoutError {
 		LOG.Error("oplog syncer internal error: %v", err)
 		// error is nil indicate that only timeout incur syncer.next()
